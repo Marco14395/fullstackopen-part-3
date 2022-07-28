@@ -1,8 +1,11 @@
 const express = require("express");
 const app = express();
 const morgan = require("morgan");
+const cors = require("cors");
 
-app.use(express.json())
+app.use(cors());
+app.use(express.json());
+app.use(express.static('build'));
 
 morgan.token("body", (req, res) => {
     const body = req.body;
@@ -69,7 +72,7 @@ app.delete('/api/persons/:id', (request, response) => {
 })
 
 const generateId = () => {
-    return Math.floor(Math.random() * 100000);
+    return Math.floor(Math.random() * 10000)
 }
 
 app.post('/api/persons', (request, response) => {
@@ -92,6 +95,17 @@ app.post('/api/persons', (request, response) => {
     }
     persons = persons.concat(person);
     response.json(person);
+})
+
+app.put('/api/persons/:id', (request, response) => {
+    const id = Number(request.params.id);
+    const body = request.body;
+    const number = body.number;
+    const name = body.name;
+    const person = persons.find(person => person.id === id);
+    newPerson = {...person, number: number};
+    persons = persons.map(person => person.name == name? newPerson: person)
+    response.json(newPerson);
 })
 
 const PORT = process.env.PORT || 3001
